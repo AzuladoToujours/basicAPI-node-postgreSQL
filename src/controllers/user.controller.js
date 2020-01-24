@@ -1,16 +1,8 @@
-const { Pool } = require('pg');
-
-const pool = new Pool({
-  host: 'localhost',
-  user: 'postgres',
-  password: '',
-  database: 'firstapi',
-  port: '5432'
-});
+const dbQuery = require('../config');
 
 const getUsers = async (req, res) => {
   try {
-    const response = await pool.query('SELECT * FROM users');
+    const response = await dbQuery.query('SELECT * FROM users');
     if (!response) {
       return res.status(400).end();
     }
@@ -24,7 +16,7 @@ const getUsers = async (req, res) => {
 const createUser = async (req, res) => {
   const { name, email } = req.body;
   try {
-    const response = await pool.query(
+    const response = await dbQuery.query(
       'INSERT INTO users (name, email) VALUES ($1, $2)',
       [name, email]
     );
@@ -48,7 +40,7 @@ const createUser = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const response = await pool.query('SELECT * FROM users WHERE id = $1', [
+    const response = await dbQuery.query('SELECT * FROM users WHERE id = $1', [
       id
     ]);
 
@@ -67,7 +59,7 @@ const updateUser = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const { name, email } = req.body;
-    const response = await pool.query(
+    const response = await dbQuery.query(
       'UPDATE users SET name = $1, email= $2 WHERE id = $3',
       [name, email, id]
     );
@@ -82,7 +74,9 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const response = await pool.query('DELETE FROM users WHERE id = $1', [id]);
+    const response = await dbQuery.query('DELETE FROM users WHERE id = $1', [
+      id
+    ]);
 
     res.status(200).json({ message: 'User deleted succesfuly' });
   } catch (e) {
